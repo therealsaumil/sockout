@@ -1,4 +1,4 @@
-# sockout-ARM #
+# sockout ARM #
 
 by Saumil Shah [@therealsaumil][saumil]
 
@@ -43,6 +43,10 @@ Next, transfer `gdbserver` to the target as follows:
 On the target, run `./sockout > gdbserver; chmod +x gdbserver`
 
 On the source system, run `nc 10.20.50.15 4444 < gdbserver`. Sometimes you have to terminate the source `nc` using `Ctrl+C`.
+
+### Static ARM Binaries ###
+
+I routinely use several statically compiled/linked ARM binaries when analysing IoT systems. A growing set of static ARM binaries can be found at https://github.com/therealsaumil/static-arm-bins 
 
 ## Creating a minimal ELF binary ##
 
