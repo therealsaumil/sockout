@@ -4,7 +4,7 @@ by Saumil Shah [@therealsaumil][saumil]
 
 [saumil]: https://twitter.com/therealsaumil
 
-A minimal ARM ELF binary (185 bytes) to listen on TCP port 4444 and dump the contents to standard output. Use `sockout` to transfer larger binaries on an ARM Linux target where you have only console I/O. (e.g. telnet, minicom, reverse shell, etc).
+A minimal ARM ELF binary to listen on TCP port 4444 and dump the contents to standard output. Use `sockout` to transfer larger binaries on an ARM Linux target where you have only console I/O. (e.g. telnet, minicom, reverse shell, etc).
 
 `sockout` is meant to be recreated on the target using `printf` shell commands.
 
@@ -37,6 +37,12 @@ chmod +x sockout
 Transfer a binary `gdbserver` on an ARM Linux system using `sockout`. We assume the IP address of the ARM Linux system is 10.20.50.15.
 
 First, we create the `sockout` binary on the target system using the 13 commands listed above.
+
+Next, transfer `gdbserver` to the target as follows:
+
+On the target, run `./sockout > gdbserver; chmod +x gdbserver`
+
+On the source system, run `nc 10.20.50.15 4444 < gdbserver`. Sometimes you have to terminate the source `nc` using `Ctrl+C`.
 
 ## Creating a minimal ELF binary ##
 
