@@ -1,24 +1,33 @@
 /* From socket to standard output
  * Loader stub to facilitate
- * transferring binaries onto an
+ * transferring binaries into an
  * ARM target
- *
- * Doesn't use any THUMB code for older
- * kernels that don't support THUMB mode
- * syscalls
  *
  * mimics the behaviour of:
  *
  * nc -l -p 4444
  *
+ * Note that this utility does not
+ * support any command line arguments
+ * because it has to be minimal.
+ *
+ * If you want to change the port,
+ * there is a utility included to do so,
+ * by patching the literal pool.
+ *
  * by Saumil Shah
+ *    ARM IoT Exploit Laboratory
  */
 
 .section .text
 .global _start
 _start:
     .code 32
+    adr     r1, THUMB+1
+    bx      r1
 
+THUMB:
+    .code 16
     // socket(2, 1, 0)
     mov     r0, #2
     mov     r1, #1
@@ -48,7 +57,8 @@ _start:
     mov     r4, r0             // save new client socket value to r4
 
     // set aside 1024 bytes of stack space for buffer
-    mov     r3, #1024
+    mov     r3, #1
+    lsl     r3, #10            // r3 = 1024
     mov     r1, sp             // r1 = buf
     sub     r1, r1, r3
     mov     sp, r1
@@ -85,4 +95,4 @@ READ_WRITE_LOOP:
 SOCKADDR:
     .ascii "\x02\x00"          // AF_INET
     .ascii "\x11\x5c"          // port number 4444
-    .word  0x00000000          // Bind to 0.0.0.0
+    .byte  0,0,0,0             // Bind to 0.0.0.0

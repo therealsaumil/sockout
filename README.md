@@ -1,110 +1,166 @@
-# sockout ARM #
+# sockout utils for ARM #
 
 by Saumil Shah [@therealsaumil][saumil]
 
 [saumil]: https://twitter.com/therealsaumil
 
-A minimal ARM ELF binary to listen on TCP port 4444 and dump the contents to standard output. Use `sockout` to transfer larger binaries on an ARM Linux target where you have only console I/O. (e.g. telnet, minicom, reverse shell, etc).
+## TL;DR: ##
+The sockout utilities are set of minimal ARM ELF binaries to facilitate large file transfer into and out of an ARM IoT Linux target, where you only have console I/O (e.g. telnet, minicom, reverse shell, etc).
 
-`sockout` is meant to be recreated on the target using `printf` shell commands.
+`sockbind`: listens on TCP port 4444 and dumps the contents to standard output.
+`sockconnect`: reads standard input and dumps it to an IP address on port 4444.
 
-## TL;DR: Give me the code ##
+`sockbind` behaves exactly like `nc -l -p 4444`
+`sockconnect` behaves exactly like `nc <ip_address> 4444`
 
-Here you are! Copy and paste these 13 lines in your shell and you will have an executable `sockout` binary, ready to run.
+`sockbind` and `sockconnect` are meant to be recreated on the target using `printf` shell commands. (Refer `sockbind.cmds` and `sockconnect.cmds`)
 
+## Shut up and give me the code ##
+Here you are! Copy and paste these lines in your shell and you will have an executable `sockbind` and `sockconnect` binaries, ready to run.
+
+### sockbind commands ###
 ```
-printf "%b" "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00" >> sockout
-printf "%b" "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x00\x01\x00\x34\x00\x00\x00" >> sockout
-printf "%b" "\xcc\x00\x00\x00\x00\x02\x00\x05\x34\x00\x20\x00\x01\x00\x28\x00" >> sockout
-printf "%b" "\x03\x00\x02\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00" >> sockout
-printf "%b" "\x00\x00\x01\x00\xb8\x00\x00\x00\xb8\x00\x00\x00\x05\x00\x00\x00" >> sockout
-printf "%b" "\x00\x00\x01\x00\x01\x10\x8f\xe2\x11\xff\x2f\xe1\x02\x20\x01\x21" >> sockout
-printf "%b" "\x52\x40\xc8\x27\x51\x37\x00\xdf\x04\x1c\x11\xa1\x10\x22\x01\x37" >> sockout
-printf "%b" "\x00\xdf\x20\x1c\x49\x40\x02\x37\x00\xdf\x20\x1c\x52\x40\x01\x37" >> sockout
-printf "%b" "\x00\xdf\x04\x1c\x01\x23\x9b\x02\x69\x46\xc9\x1a\x8d\x46\x20\x1c" >> sockout
-printf "%b" "\x1a\x1c\x03\x27\x00\xdf\x02\x1c\x01\x20\x04\x27\x00\xdf\x00\x2a" >> sockout
-printf "%b" "\xf5\xdc\x20\x1c\x06\x27\x00\xdf\x40\x40\x01\x27\x00\xdf\xc0\x46" >> sockout
-printf "%b" "\x02\x00\x11\x5c\x00\x00\x00\x00\x00" >> sockout
-chmod +x sockout
+printf "%b" "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00" >> sockbind
+printf "%b" "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x00\x01\x00\x34\x00\x00\x00" >> sockbind
+printf "%b" "\xcc\x00\x00\x00\x00\x02\x00\x05\x34\x00\x20\x00\x01\x00\x28\x00" >> sockbind
+printf "%b" "\x03\x00\x02\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00" >> sockbind
+printf "%b" "\x00\x00\x01\x00\xb8\x00\x00\x00\xb8\x00\x00\x00\x05\x00\x00\x00" >> sockbind
+printf "%b" "\x00\x00\x01\x00\x01\x10\x8f\xe2\x11\xff\x2f\xe1\x02\x20\x01\x21" >> sockbind
+printf "%b" "\x52\x40\xc8\x27\x51\x37\x00\xdf\x04\x1c\x11\xa1\x10\x22\x01\x37" >> sockbind
+printf "%b" "\x00\xdf\x20\x1c\x49\x40\x02\x37\x00\xdf\x20\x1c\x52\x40\x01\x37" >> sockbind
+printf "%b" "\x00\xdf\x04\x1c\x01\x23\x9b\x02\x69\x46\xc9\x1a\x8d\x46\x20\x1c" >> sockbind
+printf "%b" "\x1a\x1c\x03\x27\x00\xdf\x02\x1c\x01\x20\x04\x27\x00\xdf\x00\x2a" >> sockbind
+printf "%b" "\xf5\xdc\x20\x1c\x06\x27\x00\xdf\x40\x40\x01\x27\x00\xdf\xc0\x46" >> sockbind
+printf "%b" "\x02\x00\x11\x5c\x00\x00\x00\x00\x00" >> sockbind
 ```
 
-## Usage ##
+### sockconnect commands ###
+```
+printf "%b" "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00" >> sockconnect
+printf "%b" "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x00\x01\x00\x34\x00\x00\x00" >> sockconnect
+printf "%b" "\xb8\x00\x00\x00\x00\x02\x00\x05\x34\x00\x20\x00\x01\x00\x28\x00" >> sockconnect
+printf "%b" "\x03\x00\x02\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00" >> sockconnect
+printf "%b" "\x00\x00\x01\x00\xa4\x00\x00\x00\xa4\x00\x00\x00\x05\x00\x00\x00" >> sockconnect
+printf "%b" "\x00\x00\x01\x00\x01\x10\x8f\xe2\x11\xff\x2f\xe1\x02\x20\x01\x21" >> sockconnect
+printf "%b" "\x52\x40\xc8\x27\x51\x37\x00\xdf\x04\x1c\x0c\xa1\x10\x22\x02\x37" >> sockconnect
+printf "%b" "\x00\xdf\x01\x23\x9b\x02\x69\x46\xc9\x1a\x8d\x46\x00\x20\x1a\x1c" >> sockconnect
+printf "%b" "\x03\x27\x00\xdf\x02\x1c\x20\x1c\x04\x27\x00\xdf\x00\x2a\xf5\xdc" >> sockconnect
+printf "%b" "\x20\x1c\x06\x27\x00\xdf\x40\x40\x01\x27\x00\xdf\x02\x00\x11\x5c" >> sockconnect
+printf "%b" "\x0a\x14\x03\x28\x00" >> sockconnect
+```
+## Files
 
-`sockout` behaves exactly like `nc -l -p 4444`
+#### Assembly source code ####
+* `sockbind.s` - ARM assembly source for `sockbind`
+* `sockconnect.s` - ARM assembly source for `sockconnect`
+* `sockbind_nothumb.s` - Pure ARM assembly source for `sockbind` (no Thumb code)
+* `sockconnect_nothumb.s` - Pure ARM assembly source for `sockconnect` (no Thumb code)
 
-### Example: ###
+#### Utilities ####
+* `truncate_elf.sh` - Truncates the ELF binary generated by the linker
+* `convert_to_printf.sh` - Generates `.cmds` files for re-creating the binaries on a target ARM Linux IoT device, using only the command line
+* `patch_ip` - Patches an IPv4 IP address into `sockconnect`/`sockconnect_nothumb`
+* `patch_port` - Patches a port number into the `sockbind`/`sockconnect` binaries and their `_nothumb` variants
 
-Transfer a binary `gdbserver` on an ARM Linux system using `sockout`. We assume the IP address of the ARM Linux system is 10.20.50.15.
+#### Cut and Paste cmds files ####
+* `sockbind.cmds` - Cut and paste the contents to recreate `sockbind` from CLI
+* `sockconnect.cmds` - Cut and paste the contents to recreate `sockconnect` from CLI
+* `sockbind_nothumb.cmds` - Cut and paste the contents to recreate `sockbind_nothumb` from CLI
+* `sockconnect_nothumb.cmds` - Cut and paste the contents to recreate `sockconnect_nothumb` from CLI
 
-First, we create the `sockout` binary on the target system using the 13 commands listed above.
+## Example 1: Transfer `gdbserver` into a device ##
+
+Transfer a binary `gdbserver` on an ARM Linux system using `sockbind`. We assume the IP address of the ARM Linux system is 10.20.50.15.
+
+First, we create the `sockbind` binary on the target system using the `sockbind.cmds` commands listed above.
 
 Next, transfer `gdbserver` to the target as follows:
 
-On the target, run `./sockout > gdbserver; chmod +x gdbserver`
+On the target, run `./sockbind > gdbserver; chmod +x gdbserver`
 
-On the source system, run `nc 10.20.50.15 4444 < gdbserver`. Sometimes you have to terminate the source `nc` using `Ctrl+C`.
+On the source system, run
 
-### Static ARM Binaries ###
+```
+nc 10.20.50.15 4444 < gdbserver
+```
 
-I routinely use several statically compiled/linked ARM binaries when analysing IoT systems. A growing set of static ARM binaries can be found at https://github.com/therealsaumil/static-arm-bins 
+Sometimes you have to terminate the source `nc` using `Ctrl+C`.
+
+## Example 2: Extract `/dev/mtdblock5` from a device ##
+
+We want to copy the contents of `/dev/mtdblock5` from an ARM Linux system using `sockconnect`. We assume the IP address of the target computer is 10.20.3.40, and it is listening on port 4444.
+
+First, we patch the `sockconnect` binary using the `patch_ip` utility, and convert the resultant binary to printable commands:
+
+```
+./patch_ip sockconnect 10.20.3.40
+./convert_to_printf sockconnect > sockconnect.cmds
+```
+
+Next, we create the `sockconnect` binary on the target system using the `sockconnect.cmds` commands listed above. Connect to your device's console and paste the commands from `sockconnect.cmds` and lastly run `chmod +x sockconnect`.
+
+Run a netcat listener on the target computer on port 4444:
+
+```
+nc -nvv -l -p 4444 > mtdblock5.bin
+```
+
+Lastly, transfer the contents of `/dev/mtdblock5` to the target computer 10.20.3.40 using:
+
+```
+dd if=/dev/mtdblock5 | ./sockconnect
+```
+
+Sometimes you have to terminate the source `nc` using `Ctrl+C`.
 
 ## Creating a minimal ELF binary ##
 
-A few clever tricks have been employed to create a minimal `sockout` binary. The binary is currently 158 bytes long.
+A few clever tricks have been employed to create a minimal `sockbind` and `sockconnect` binaries.
 
 * Use THUMB instructions
 * `strip` the binary after linking
 * Remove ELF sections that do not cripple the binary (e.g. `.ARM.attributes`)
 * Remove the `.shstrtab` section by truncating the ELF binary
 
-Here is the output of `make`
+Here is the output of `make` for `sockbind`
 
 ```
-krafty@arm6:~/sockout$ make
-as sockout.s -o sockout.o
-ld sockout.o -o sockout
-strip sockout
-objcopy --remove-section .ARM.attributes sockout
-./truncate_elf.sh sockout
+krafty@arm6:~/sockbind$ make
+as sockbind.s -o sockbind.o
+ld sockbind.o -o sockbind
+strip sockbind
+objcopy --remove-section .ARM.attributes sockbind
+./truncate_elf.sh sockbind
 185+0 records in
 185+0 records out
 185 bytes copied, 0.012916 s, 14.3 kB/s
-./convert_to_printf.sh sockout
-printf "%b" "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00" >> sockout
-printf "%b" "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x00\x01\x00\x34\x00\x00\x00" >> sockout
-printf "%b" "\xcc\x00\x00\x00\x00\x02\x00\x05\x34\x00\x20\x00\x01\x00\x28\x00" >> sockout
-printf "%b" "\x03\x00\x02\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00" >> sockout
-printf "%b" "\x00\x00\x01\x00\xb8\x00\x00\x00\xb8\x00\x00\x00\x05\x00\x00\x00" >> sockout
-printf "%b" "\x00\x00\x01\x00\x01\x10\x8f\xe2\x11\xff\x2f\xe1\x02\x20\x01\x21" >> sockout
-printf "%b" "\x52\x40\xc8\x27\x51\x37\x00\xdf\x04\x1c\x11\xa1\x10\x22\x01\x37" >> sockout
-printf "%b" "\x00\xdf\x20\x1c\x49\x40\x02\x37\x00\xdf\x20\x1c\x52\x40\x01\x37" >> sockout
-printf "%b" "\x00\xdf\x04\x1c\x01\x23\x9b\x02\x69\x46\xc9\x1a\x8d\x46\x20\x1c" >> sockout
-printf "%b" "\x1a\x1c\x03\x27\x00\xdf\x02\x1c\x01\x20\x04\x27\x00\xdf\x00\x2a" >> sockout
-printf "%b" "\xf5\xdc\x20\x1c\x06\x27\x00\xdf\x40\x40\x01\x27\x00\xdf\xc0\x46" >> sockout
-printf "%b" "\x02\x00\x11\x5c\x00\x00\x00\x00\x00" >> sockout
-chmod +x sockout
+./convert_to_printf.sh sockbind
+printf "%b" "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00" >> sockbind
+printf "%b" "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x00\x01\x00\x34\x00\x00\x00" >> sockbind
+printf "%b" "\xcc\x00\x00\x00\x00\x02\x00\x05\x34\x00\x20\x00\x01\x00\x28\x00" >> sockbind
+printf "%b" "\x03\x00\x02\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00" >> sockbind
+printf "%b" "\x00\x00\x01\x00\xb8\x00\x00\x00\xb8\x00\x00\x00\x05\x00\x00\x00" >> sockbind
+printf "%b" "\x00\x00\x01\x00\x01\x10\x8f\xe2\x11\xff\x2f\xe1\x02\x20\x01\x21" >> sockbind
+printf "%b" "\x52\x40\xc8\x27\x51\x37\x00\xdf\x04\x1c\x11\xa1\x10\x22\x01\x37" >> sockbind
+printf "%b" "\x00\xdf\x20\x1c\x49\x40\x02\x37\x00\xdf\x20\x1c\x52\x40\x01\x37" >> sockbind
+printf "%b" "\x00\xdf\x04\x1c\x01\x23\x9b\x02\x69\x46\xc9\x1a\x8d\x46\x20\x1c" >> sockbind
+printf "%b" "\x1a\x1c\x03\x27\x00\xdf\x02\x1c\x01\x20\x04\x27\x00\xdf\x00\x2a" >> sockbind
+printf "%b" "\xf5\xdc\x20\x1c\x06\x27\x00\xdf\x40\x40\x01\x27\x00\xdf\xc0\x46" >> sockbind
+printf "%b" "\x02\x00\x11\x5c\x00\x00\x00\x00\x00" >> sockbind
 ```
 
-## sockout_nothumb - No THUMB code ##
+## Avoiding THUMB code ##
 
-Certain older kernels do not support syscalls in THUMB mode. For such cases, we have an ARM only version of `sockout`
+Certain older kernels do not support syscalls in THUMB mode. For such cases, we have ARM-only versions of `sockbind` and `sockconnect`. Please refer to `sockbind_nothumb.s`, `sockconnect_nothumb.s` and the respect `sockbind_nothumb.cmds` and `sockconnect_nothumb.cmds` files.
 
-```
-printf "%b" "\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00" >> sockout_nothumb
-printf "%b" "\x02\x00\x28\x00\x01\x00\x00\x00\x54\x00\x01\x00\x34\x00\x00\x00" >> sockout_nothumb
-printf "%b" "\x10\x01\x00\x00\x00\x02\x00\x05\x34\x00\x20\x00\x01\x00\x28\x00" >> sockout_nothumb
-printf "%b" "\x03\x00\x02\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00" >> sockout_nothumb
-printf "%b" "\x00\x00\x01\x00\xfc\x00\x00\x00\xfc\x00\x00\x00\x05\x00\x00\x00" >> sockout_nothumb
-printf "%b" "\x00\x00\x01\x00\x02\x00\xa0\xe3\x01\x10\xa0\xe3\x02\x20\x22\xe0" >> sockout_nothumb
-printf "%b" "\xc8\x70\xa0\xe3\x51\x70\x87\xe2\x00\x00\x00\xef\x00\x40\xa0\xe1" >> sockout_nothumb
-printf "%b" "\x7c\x10\x8f\xe2\x10\x20\xa0\xe3\x01\x70\x87\xe2\x00\x00\x00\xef" >> sockout_nothumb
-printf "%b" "\x04\x00\xa0\xe1\x01\x10\x21\xe0\x02\x70\x87\xe2\x00\x00\x00\xef" >> sockout_nothumb
-printf "%b" "\x04\x00\xa0\xe1\x02\x20\x22\xe0\x01\x70\x87\xe2\x00\x00\x00\xef" >> sockout_nothumb
-printf "%b" "\x00\x40\xa0\xe1\x01\x3b\xa0\xe3\x0d\x10\xa0\xe1\x03\x10\x41\xe0" >> sockout_nothumb
-printf "%b" "\x01\xd0\xa0\xe1\x04\x00\xa0\xe1\x03\x20\xa0\xe1\x03\x70\xa0\xe3" >> sockout_nothumb
-printf "%b" "\x00\x00\x00\xef\x00\x20\xa0\xe1\x01\x00\xa0\xe3\x04\x70\xa0\xe3" >> sockout_nothumb
-printf "%b" "\x00\x00\x00\xef\x00\x00\x52\xe3\xf5\xff\xff\xca\x04\x00\xa0\xe1" >> sockout_nothumb
-printf "%b" "\x06\x70\xa0\xe3\x00\x00\x00\xef\x00\x00\x20\xe0\x01\x70\xa0\xe3" >> sockout_nothumb
-printf "%b" "\x00\x00\x00\xef\x02\x00\x11\x5c\x00\x00\x00\x00\x00" >> sockout_nothumb
-```
+## Static ARM Binaries ##
+
+I routinely use several statically compiled/linked ARM binaries when analysing IoT systems. A growing set of static ARM binaries can be found at https://github.com/therealsaumil/static-arm-bins 
+
+## Closing Comments ##
+
+I have been actively developing the [ARM-X Firmware Emulation Framework](https://armx.exploitlab.net/), for emulating ARM IoT devices. These utilities have been created during my research when I was faced with certain difficult situations.
+
+Saumil Shah
+[@therealsaumil][saumil]
 

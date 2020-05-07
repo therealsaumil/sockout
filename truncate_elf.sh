@@ -13,6 +13,6 @@ then
 fi
 
 offset=$(grep --byte-offset --only-matching --text '.shstrtab' "$1" | cut -d':' -f1)
-dd bs=1 count=$offset if=$1 of=/tmp/$$.tmp
-mv /tmp/$$.tmp $1
-
+dd bs=1 count=$offset if=$1 of=$$.tmp
+mv $$.tmp $1
+chmod +x $1
