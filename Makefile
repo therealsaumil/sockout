@@ -1,16 +1,14 @@
-TARGETS = sockconnect \
-          sockconnect_nothumb \
-          sockbind \
-          sockbind_nothumb
+TARGETS = sockbind \
+          sockbind_nothumb \
+          sockconnect \
+          sockconnect_nothumb
 
 all: $(TARGETS)
 
 $(TARGETS): % : %.s
 	as $< -o $@.o
-	ld $@.o -o $@
-	strip $@
-	objcopy --remove-section .ARM.attributes $@
-	./truncate_elf.sh $@
+	objcopy $@.o -O binary $@
+	chmod +x $@
 	./convert_to_printf.sh $@ | tee $@.cmds
 
 clean:

@@ -18,18 +18,18 @@ binmode(BINFILE);
 $bindata = <BINFILE>;
 close(BINFILE);
 
-# The last 7 bytes of the binary are the Literal Pool
-# PP PP AA AA AA AA 00
+# The last 6 bytes of the binary are the Literal Pool
+# PP PP AA AA AA AA
 # Where PPPP is the 16 bit Port number
 # and AAAAAAAA is the 32 bit IP Address
 
-$bindata = substr($bindata, 0, -7);
+$bindata = substr($bindata, 0, -6);
 
 @ipbytes = split(/\./, $ipaddress);
 $ip32bit = pack('CCCC', @ipbytes);
 $port16bit = pack('n', $portnum);
 
-$bindata = $bindata . $port16bit .$ip32bit . "\x00";
+$bindata = $bindata . $port16bit .$ip32bit;
 
 open(OUTPUT, ">$binfile") || die("Cannot write to $binfile\n");
 binmode(OUTPUT);

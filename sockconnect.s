@@ -17,15 +17,34 @@
  * literal pool.
  *
  * by Saumil Shah
- *    ARM IoT Exploit Laboratory
+ *
+ * Header inspired by Minimal ARM ELF binary
+ * https://github.com/mydzor/tinyelf-arm
  */
 
-.section .text
-.global _start
-_start:
+.macro bump addr
+.word \addr+0x200000
+.endm
+
+ehdr:                    /* Elf32_Ehdr                      */
+    .byte   0x7F         /* e_ident                         */
+    .ascii  "ELF"
+    .word   1            /*                    |p_type      */
+    .word   0            /*                    |p_offset    */
+    .word   0x200000     /*                    |p_vaddr     */
+    .word   0x280002     /* e_type & e_machine |p_paddr     */
+    bump    main         /* e_version          |p_filesz    */
+    bump    main         /* e_entry            |p_memsz     */
+    .word   4            /* e_phoff            |p_flags     */
+
+main:
     .code 32
-    adr     r1, THUMB+1
-    bx      r1
+    adr     r1, THUMB+1  /* e_shoff            |p_allign    */
+    bx      r1           /* e_flags                         */
+    .word   0x00200034   /* e_ehsize & e_phentsize          */
+                         /* eoreq r0, r0, r4, lsr r0        */
+    .word   0x00000001   /* e_phnum & e_shentsize           */
+                         /* andeq r0, r0, r1                */
 
 THUMB:
     .code 16
