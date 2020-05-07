@@ -88,12 +88,12 @@ Sometimes you have to terminate the source `nc` using `Ctrl+C`.
 
 ## Example 2: Extract `/dev/mtdblock5` from a device ##
 
-We want to copy the contents of `/dev/mtdblock5` from an ARM Linux system using `sockconnect`. We assume the IP address of the target computer is 10.20.3.40, and it is listening on port 4444.
+We want to copy the contents of `/dev/mtdblock5` from an ARM Linux system using `sockconnect`. We assume the IP address of the target computer is 10.20.3.40, and it is listening on port 5555.
 
 First, we patch the `sockconnect` binary using the `patch_ip` utility, and convert the resultant binary to printable commands:
 
 ```
-./patch_ip sockconnect 10.20.3.40
+./patch_ip 10.20.3.40 5555 sockconnect
 ./convert_to_printf sockconnect > sockconnect.cmds
 ```
 
